@@ -1,0 +1,31 @@
+{
+    "Logging": {
+        "Enable": true,
+        "Level": "DEBUG"
+    },
+    "Redis":{
+        "Host": "172.17.0.3",
+        "Port": "6379",
+        "PoolMaxIdle":300,
+        "PoolMaxActive":300,
+        "PoolIdleTimeout":600,
+        "TTL":60,
+        "Password":"",
+        "ConnTimeout":500
+    },
+    "GracefulTermTimeMillis": 500,
+    "SQL":{
+        "Host":"172.17.0.2",  
+        "Port":"3306",
+        "Username":"root",
+        "Password":"password",
+        "Database": "my_db",
+        "SchemaVersion": "0.0.1",
+        "Timeout":"20000ms",
+        "Protocol":"tcp",
+        "MaxOpenConnection":150,
+        "MaxIdleConnection":150,
+        "IdleConnectionTimeoutSec":90,
+        "ConnectionTimeoutSec":10
+      }       
+  }
