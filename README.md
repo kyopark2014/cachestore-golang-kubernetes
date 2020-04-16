@@ -40,6 +40,7 @@ if err != nil {
 	os.Exit(1)
 }
 defer create.Close()
+```
 
 // Create table
 var statement string = "CREATE TABLE IF NOT EXISTS " + Dbname + "." + Dbtable + " (" + "uid VARCHAR(20), name VARCHAR(20), email VARCHAR(30), age BIGINT" + ")"
