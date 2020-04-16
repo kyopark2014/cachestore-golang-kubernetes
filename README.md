@@ -5,7 +5,13 @@ The caching mechanism can enhance the performance of a system in which a tempora
 
 
 
-<img src="https://user-images.githubusercontent.com/52392004/79468854-6b9aff80-803a-11ea-872d-01aa7720d32d.png" width="90%"></img>
+<img src="https://user-images.githubusercontent.com/52392004/79468854-6b9aff80-803a-11ea-872d-01aa7720d32d.png" width="70%"></img>
+1) DNS Query where the ip address of Load Balancer was used 
+2) All requests from clients will be through to load balance which provides scale-out
+3) One of applications servers will be allocated i.e. round-robin 
+4) Caching is an effective way to reduce the access of database which is usually the bottleneck when the scale was extended
+5) Cached data will be expired and then need to query from database
+6) The amount of queries for database can be reduced once a caching algorithm was used
 
 
 ### Initiation
