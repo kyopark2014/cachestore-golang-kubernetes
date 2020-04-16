@@ -1,8 +1,9 @@
 # cachestore-golang-kubernetes
 
 It is an implementation of cached store based on golang in kubernetes where the combination of redis cache and MySQL is applied.
+The caching mechanism can enhance the performance of a system in which a temporary memory was used between the application and the persistent database. So, cache memory stores recently used data items in order to reduce the number of database hits as much as possible.
 
-Caching is a mechanism to enhance the performance of a system. It is a temporary memory that lies between the application and the persistent database. Cache memory stores recently used data items in order to reduce the number of database hits as much as possible.
+
 
 
 
@@ -128,29 +129,22 @@ func Retrieve(w http.ResponseWriter, r *http.Request) {
 
 
 #### Go-MySQL-Driver
-Go-MySQL-Driver
 
+For SQL, I am gonna use Go-MySQL-Driver.
 https://github.com/go-sql-driver/mysql 
 
-install 
-
+##### install 
 ```c
 $ go get -u github.com/go-sql-driver/mysql
 ```
 
-import sql driver in main.go
+##### import sql driver in main.go
 
 ```go
 import( _ "github.com/go-sql-driver/mysql")
 ```
 
-DSN (Data Source Name)
-
-
-```
-
-
-#### Data type
+##### data type
 ```c
 type UserProfile struct {
 	UID   string `json:"uid"`
