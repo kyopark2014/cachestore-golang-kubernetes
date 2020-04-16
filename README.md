@@ -5,7 +5,7 @@ The caching mechanism can enhance the performance of a system in which a tempora
 
 
 
-
+<img src="https://user-images.githubusercontent.com/52392004/79468854-6b9aff80-803a-11ea-872d-01aa7720d32d.png" width="90%"></img>
 
 
 ### Initiation
