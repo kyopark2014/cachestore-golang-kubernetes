@@ -33,10 +33,7 @@ func NewDatabase(cfg config.SQLConfig) {
 	// Create Table
 	//  UID   string, Name  string, Email string, Age   int
 	//  CREATE TABLE IF NOT EXISTS my_db.data (uid VARCHAR(20), name VARCHAR(20), email VARCHAR(30), age BIGINT);
-	var statement string = "CREATE TABLE IF NOT EXISTS " + Dbname + "." + Dbtable + " (" + "uid VARCHAR(20), name VARCHAR(20), email VARCHAR(30), age BIGINT" + ")"
-	log.D("%v", statement)
-
-	createTable, err := MyDb.Query(statement)
+	createTable, err := MyDb.Query("CREATE TABLE IF NOT EXISTS " + Dbname + "." + Dbtable + " (uid VARCHAR(20), name VARCHAR(20), email VARCHAR(30), age BIGINT)")
 	if err != nil {
 		log.E("Fail to create database %v", err)
 		os.Exit(1)
@@ -49,11 +46,8 @@ func NewDatabase(cfg config.SQLConfig) {
 // InsertToDB is to put input data into database
 func InsertToDB(value data.UserProfile) error {
 	// INSERT INTO my_db.data (uid, name, email, age) VALUES("johnny", "Park", "john@email.com",21);
-	statement := "INSERT INTO " + Dbname + "." + Dbtable + " (uid, name, email, age) VALUES (\"" +
-		value.UID + "\", \"" + value.Name + "\", \"" + value.Email + "\", " + strconv.FormatInt(int64(value.Age), 10) + ")"
-	log.D("%v", statement)
-
-	insert, err := MyDb.Query(statement)
+	insert, err := MyDb.Query("INSERT INTO "+Dbname+"."+Dbtable+" (uid, name, email, age) VALUES (?, ?, ?, ?)",
+		value.UID, value.Name, value.Email, strconv.FormatInt(int64(value.Age), 10))
 	if err != nil {
 		log.E("Fail to insert data %v", err)
 		return err
@@ -67,13 +61,10 @@ func InsertToDB(value data.UserProfile) error {
 // RetrevefromDB is to get a cached data from redis. If there is no data in redis cache, it will check the database.
 func RetrevefromDB(uid string) (data.UserProfile, int) {
 	// search in data base
-	// SELECT * FROM my_db.data WHERE uid = "kyopark";
-	statement := "SELECT * FROM " + Dbname + "." + Dbtable + " WHERE uid = \"" + uid + "\""
-	log.D("%v", statement)
-
 	var value data.UserProfile
 
-	results, err := MyDb.Query(statement)
+	// SELECT * FROM my_db.data WHERE uid = "kyopark";
+	results, err := MyDb.Query("SELECT * FROM "+Dbname+"."+Dbtable+" WHERE uid = ?", uid)
 	if err != nil {
 		log.E("Fail to retrieve: %v", err)
 		return value, http.StatusInternalServerError
