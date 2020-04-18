@@ -46,8 +46,8 @@ func NewDatabase(cfg config.SQLConfig) {
 // InsertToDB is to put input data into database
 func InsertToDB(value data.UserProfile) error {
 	// INSERT INTO my_db.data (uid, name, email, age) VALUES("johnny", "Park", "john@email.com",21);
-	insert, err := MyDb.Query("INSERT INTO "+Dbname+"."+Dbtable+" (uid, name, email, age) VALUES (?, ?, ?, ?)",
-		value.UID, value.Name, value.Email, strconv.FormatInt(int64(value.Age), 10))
+	insert, err := MyDb.Query("INSERT INTO "+Dbname+"."+Dbtable+" (uid, name, email, age) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE uid=?",
+		value.UID, value.Name, value.Email, strconv.FormatInt(int64(value.Age), 10), value.UID)
 	if err != nil {
 		log.E("Fail to insert data %v", err)
 		return err
