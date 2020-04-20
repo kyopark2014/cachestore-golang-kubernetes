@@ -59,7 +59,7 @@ if err != nil {
 defer createTable.Close()
 ```
 
-##E REST API
+### REST API
 Now I am using mux to deploy REST API.
 
 ```go
