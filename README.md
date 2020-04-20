@@ -38,7 +38,7 @@ defer db.MyDb.Close()
 
 Before define apis, the database and table are initiated as bellow.
 
-```c
+```go
 // create database
 create, err := MyDb.Query("CREATE DATABASE IF NOT EXISTS " + Dbname)
 if err != nil {
@@ -48,6 +48,7 @@ if err != nil {
 defer create.Close()
 ```
 
+```go
 // Create table
 var statement string = "CREATE TABLE IF NOT EXISTS " + Dbname + "." + Dbtable + " (" + "uid VARCHAR(20), name VARCHAR(20), email VARCHAR(30), age BIGINT" + ")"
 createTable, err := MyDb.Query(statement)
@@ -59,7 +60,7 @@ defer createTable.Close()
 ```
 
 ##E REST API
-Now I am using mux in "server.go".
+Now I am using mux to deploy REST API.
 
 ```go
 r := mux.NewRouter()
@@ -72,7 +73,7 @@ var err error
 err = http.ListenAndServe(":8000", r)
 ```
 
-Define Insert() and Retrieve().
+Le me define Insert() and Retrieve().
 
 ```go
 func Insert(w http.ResponseWriter, r *http.Request) {
@@ -137,7 +138,8 @@ func Retrieve(w http.ResponseWriter, r *http.Request) {
 
 #### Go-MySQL-Driver
 
-For SQL, I am gonna use Go-MySQL-Driver.
+Go-MySQL-Driver is used for SQL.
+
 https://github.com/go-sql-driver/mysql 
 
 ##### install 
@@ -162,18 +164,17 @@ type UserProfile struct {
 ```
 
 
-Define InsertToDB to put input data into database
+Let me define InsertToDB to put input data into database
 ```go
 func InsertToDB(value data.UserProfile) error {
-	statement := "INSERT INTO " + Dbname + "." + Dbtable + " (uid, name, email, age) VALUES (\"" +
-		value.UID + "\", \"" + value.Name + "\", \"" + value.Email + "\", " + strconv.FormatInt(int64(value.Age), 10) + ")"
-	log.D("%v", statement)
-
-	insert, err := MyDb.Query(statement)
+	insert, err := MyDb.Query("INSERT INTO "+Dbname+"."+Dbtable+" (uid, name, email, age) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE uid=?",
+		value.UID, value.Name, value.Email, strconv.FormatInt(int64(value.Age), 10), value.UID)
 	if err != nil {
+		log.E("Fail to insert data %v", err)
 		return err
 	}
 	defer insert.Close()
+	log.D("Successfully inserted in SQL database")
 
 	return nil
 }
@@ -183,14 +184,9 @@ Define RetrevefromDB to get a cached data from redis. If there is no data in red
 
 ```go
 func RetrevefromDB(uid string) (data.UserProfile, int) {
-	// search in data base
-	// SELECT * FROM my_db.data WHERE uid = "kyopark";
-	statement := "SELECT * FROM " + Dbname + "." + Dbtable + " WHERE uid = \"" + uid + "\""
-	log.D("%v", statement)
-
 	var value data.UserProfile
 
-	results, err := MyDb.Query(statement)
+	results, err := MyDb.Query("SELECT * FROM "+Dbname+"."+Dbtable+" WHERE uid = ?", uid)
 	if err != nil {
 		log.E("Fail to retrieve: %v", err)
 		return value, http.StatusInternalServerError
@@ -286,7 +282,7 @@ Logging struct {
 The log level is setting using SetupLogger.
 
 ```go
-import ("restapi-golang-sample/pkg/log")
+import ("cachestore-golang-kubernetes/pkg/log")
 
 log.SetupLogger(conf.Logging.Enable, conf.Logging.Level)
 ```
