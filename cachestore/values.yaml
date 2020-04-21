@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: www.myrepository.net/kyopark/cachestore-golang-kubernetes
+  repository: kyopark/myapps
   tag: latest
   pullPolicy: IfNotPresent
 
