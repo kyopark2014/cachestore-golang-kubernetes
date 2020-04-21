@@ -4,7 +4,7 @@
         "Level": "DEBUG"
     },
     "Redis":{
-        "Host": "172.17.0.3",
+        "Host": "10.105.149.226",
         "Port": "6379",
         "PoolMaxIdle":300,
         "PoolMaxActive":300,
@@ -15,10 +15,10 @@
     },
     "GracefulTermTimeMillis": 500,
     "SQL":{
-        "Host":"172.17.0.2",  
+        "Host":"10.105.92.131",  
         "Port":"3306",
-        "Username":"root",
-        "Password":"password",
+        "Username":"minikube",
+        "Password":"minikube",
         "Database": "my_db",
         "SchemaVersion": "0.0.1",
         "Timeout":"20000ms",
