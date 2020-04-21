@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: docker.rt.sec.samsung.net/ksdyb.park/cachestore-golang-kubernetes
+  repository: www.myrepository.net/kyopark/cachestore-golang-kubernetes
   tag: latest
   pullPolicy: IfNotPresent
 
