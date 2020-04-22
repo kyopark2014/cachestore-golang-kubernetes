@@ -60,7 +60,7 @@ defer createTable.Close()
 ```
 
 ### REST API
-Now I am using mux to deploy REST API.
+Now I am using mux to deploy RESTful API.
 
 ```go
 r := mux.NewRouter()
@@ -73,7 +73,7 @@ var err error
 err = http.ListenAndServe(":8000", r)
 ```
 
-Le me define Insert() and Retrieve().
+Lets define Insert() and Retrieve().
 
 ```go
 func Insert(w http.ResponseWriter, r *http.Request) {
@@ -154,6 +154,7 @@ import( _ "github.com/go-sql-driver/mysql")
 ```
 
 ##### data type
+This is a profile to represent a person for an example.
 ```c
 type UserProfile struct {
 	UID   string `json:"uid"`
@@ -344,61 +345,58 @@ func E(format string, v ...interface{}) {
 
 
 ## Kubernetes
+In oreder to explain easily, minikube will be used.
 
-### Create EKS cluster
+### Create Minikube
 ```c
-$ eksctl create cluster -f k8s/cluster-redis-golang-kubernetes.yaml
+$ sudo minikube start --vm-driver=none --disk-size 40g
+```
+Note that no vm-driver is helpful for the performant to test in local environment but it requires recent minikube. I recommend to use v1.9.2.
+
+
+### Deploy and initialize MySQL
+```c
+$ helm install --wait \
+      --set mysqlPassword=minikube \
+      --set mysqlUser=minikube \
+      --set mysqlRootPassword=minikube \
+      --set persistence.size=4Gi \
+      --name mydb \
+      stable/mysql
+
+$ mysql -h 10.105.102.33 -uroot -pminikube -e "GRANT ALL PRIVILEGES ON *.* TO 'minikube' WITH GRANT OPTION" 
 ```
 
-### Deploy Redis server
+### Deploy Redis
 ```c
-$ kubectl create -f k8s/redis-master-deployment.yaml
-
-$ kubectl create -f k8s/redis-master-service.yaml 
+$ helm install --wait --set usePassword=false --name redis stable/redis
 ```
 
-### Change the type from ClusterIP to LoadBalancer in order to easily use 
-
+### Create Secret
 ```c
-$ kubectl edit service/redis-master
-
-$ kubectl get service/redis-master
-NAME           TYPE           CLUSTER-IP     EXTERNAL-IP                                                               PORT(S)          AGE
-redis-master   LoadBalancer   10.100.22.49   a2a61bdc0208d11eaaabc0a6b8228ff9-2077444820.eu-west-2.elb.amazonaws.com   6379:32502/TCP   28m
+$ kubectl create secret docker-registry artifactory-dockerhub \
+    --docker-server="https://index.docker.io/v1/" \
+    --docker-username="id" \
+    --docker-password="password" \
+    --docker-email=myid@mail.com \
+    -o yaml --dry-run | kubectl replace -n common --force -f -
 ```
 
-
-
-### Make docker image
+### Set the information of Repository in values.yaml
 ```c
-$ docker build -t redis-golang-kubernetes:v1 .
+image:
+  repository: docker.io/id/myapps
+  tag: v1
+  pullPolicy: IfNotPresent
 
-$ docker run -d -p 8080:8080 redis-golang-kubernetes:v1
+imagePullSecrets: 
+  - name: artifactory-dockerhub
 ```
 
-### Tagging
+### Install
 ```c
-$ docker tag redis-golang-kubernetes:v1 884942771862.dkr.ecr.eu-west-2.amazonaws.com/repository-redis-golang
+$ helm install cachestore
 ```
-
-### Create repository if required
-```c
-$ aws ecr create-repository --region eu-west-2 --repository-name repository-redis-golang
-```
-
-### Push the image to ECR
-```c
-$ docker push 994942771862.dkr.ecr.eu-west-2.amazonaws.com/repository-redis-golang
-```
-
-### Deploy and run
-```c
-$ kubectl create -f redis-golang-kubernetes-deployment.yaml
-$ kubectl create -f redis-golang-kubernetes-server-service.yaml 
-```
-
-
-
 
 ## The result
 #### Set data
