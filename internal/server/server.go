@@ -73,6 +73,11 @@ func Retrieve(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// LiveCheck is the api to check the pod is alive
+func LiveCheck(w http.ResponseWriter, r *http.Request) {
+	log.D("Live Check ...")
+}
+
 // InitServer initializes the REST api server
 func InitServer(conf *config.AppConfig) error {
 	// DSN: Data Source Name
@@ -102,9 +107,10 @@ func InitServer(conf *config.AppConfig) error {
 	// Route Handler / Endpoints
 	r.HandleFunc("/add", Insert).Methods("GET")
 	r.HandleFunc("/search/{key}", Retrieve).Methods("GET")
+	r.HandleFunc("/", LiveCheck).Methods("GET")
 
 	var err error
-	err = http.ListenAndServe(":8000", r)
+	err = http.ListenAndServe(":8080", r)
 
 	return err
 }
