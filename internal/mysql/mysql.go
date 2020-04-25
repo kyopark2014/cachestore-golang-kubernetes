@@ -1,4 +1,4 @@
-package db
+package mysql
 
 import (
 	"cachestore-golang-kubernetes/internal/config"

@@ -8,8 +8,8 @@ import (
 
 	"cachestore-golang-kubernetes/internal/config"
 	"cachestore-golang-kubernetes/internal/data"
-	"cachestore-golang-kubernetes/internal/db"
 	"cachestore-golang-kubernetes/internal/log"
+	"cachestore-golang-kubernetes/internal/mysql"
 	"cachestore-golang-kubernetes/internal/rediscache"
 
 	"github.com/gorilla/mux"
@@ -23,7 +23,7 @@ func Insert(w http.ResponseWriter, r *http.Request) {
 	log.D("value: %+v", value)
 
 	// Insert into database
-	err := db.InsertToDB(value)
+	err := mysql.InsertToDB(value)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -60,7 +60,7 @@ func Retrieve(w http.ResponseWriter, r *http.Request) {
 		log.D("No data in redis cache then search it in database.")
 
 		// search in database
-		value, errCode := db.RetrevefromDB(uid)
+		value, errCode := mysql.RetrevefromDB(uid)
 		if errCode == http.StatusInternalServerError || errCode == http.StatusNotFound {
 			w.WriteHeader(errCode)
 			return
@@ -84,22 +84,22 @@ func InitServer(conf *config.AppConfig) error {
 	var DSN string = conf.SQL.Username + ":" + conf.SQL.Password + "@" + conf.SQL.Protocol + "(" + conf.SQL.Host + ":" + conf.SQL.Port + ")" + "/"
 	log.D("DSN: %v", DSN)
 
-	db.Dbname = conf.SQL.Database
-	db.Dbtable = "data"
+	mysql.Dbname = conf.SQL.Database
+	mysql.Dbtable = "data"
 
 	// db, err := sql.Open("mysql", "root:password@tcp(172.17.0.2:3306)/")
 	var sqlerr error
-	db.MyDb, sqlerr = sql.Open("mysql", DSN)
+	mysql.MyDb, sqlerr = sql.Open("mysql", DSN)
 	// if there is an error opening the connection, handle it
 	if sqlerr != nil {
 		return sqlerr
 	}
 	// defer the close till after the main function has finished
 	// executing
-	defer db.MyDb.Close()
+	defer mysql.MyDb.Close()
 
 	// Initiate the SQL database
-	db.NewDatabase(conf.SQL)
+	mysql.NewDatabase(conf.SQL)
 
 	// Init Router
 	r := mux.NewRouter()
